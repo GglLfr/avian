@@ -950,7 +950,8 @@ impl Collider {
     /// defined by its vertex and index buffers.
     #[cfg(feature = "3d")]
     pub fn convex_decomposition(vertices: Vec<Vector>, indices: Vec<[u32; 3]>) -> Self {
-        SharedShape::convex_decomposition(&vertices, &indices).into()
+        let pv = vertices;
+        SharedShape::convex_decomposition(&pv, &indices).into()
     }
 
     /// Creates a collider shape with a compound shape obtained from the decomposition of a given polyline
@@ -975,8 +976,8 @@ impl Collider {
         indices: Vec<[u32; 3]>,
         params: VhacdParameters,
     ) -> Self {
-        SharedShape::convex_decomposition_with_params(&vertices, &indices, &params.clone().into())
-            .into()
+        let pv = vertices;
+        SharedShape::convex_decomposition_with_params(&pv, &indices, &params.clone().into()).into()
     }
 
     /// Creates a collider with a [convex polygon](https://en.wikipedia.org/wiki/Convex_polygon) shape obtained after computing
@@ -990,7 +991,8 @@ impl Collider {
     /// the [convex hull](https://en.wikipedia.org/wiki/Convex_hull) of the given points.
     #[cfg(feature = "3d")]
     pub fn convex_hull(points: Vec<Vector>) -> Option<Self> {
-        SharedShape::convex_hull(&points).map(Into::into)
+        let pv = points;
+        SharedShape::convex_hull(&pv).map(Into::into)
     }
 
     /// Creates a collider with a [convex polygon](https://en.wikipedia.org/wiki/Convex_polygon) shape **without** computing
@@ -1015,6 +1017,8 @@ impl Collider {
             .iter()
             .map(|c| c.as_i64vec3())
             .collect::<Vec<_>>();
+        #[cfg(all(feature = "3d", not(feature = "f64")))]
+        let grid_coordinates = &grid_coordinates;
         let shape = Voxels::new(voxel_size, grid_coordinates);
         SharedShape::new(shape).into()
     }
@@ -1023,7 +1027,8 @@ impl Collider {
     ///
     /// Each voxel has the size `voxel_size` and contains at least one point from `points`.
     pub fn voxels_from_points(voxel_size: Vector, points: &[Vector]) -> Self {
-        SharedShape::voxels_from_points(voxel_size, points).into()
+        let pp = points;
+        SharedShape::voxels_from_points(voxel_size, pp).into()
     }
 
     /// Creates a voxel collider obtained from the decomposition of the given polyline into voxelized convex parts.
@@ -1045,7 +1050,8 @@ impl Collider {
         voxel_size: Scalar,
         fill_mode: FillMode,
     ) -> Self {
-        SharedShape::voxelized_mesh(vertices, indices, voxel_size, fill_mode.into()).into()
+        let pv = vertices;
+        SharedShape::voxelized_mesh(pv, indices, voxel_size, fill_mode.into()).into()
     }
 
     /// Creates a voxel collider obtained from the decomposition of the given `Mesh` into voxelized convex parts.
@@ -1058,7 +1064,8 @@ impl Collider {
         fill_mode: FillMode,
     ) -> Option<Self> {
         extract_mesh_vertices_indices(mesh).map(|(vertices, indices)| {
-            SharedShape::voxelized_mesh(&vertices, &indices, voxel_size, fill_mode.into()).into()
+            let pv = &vertices;
+            SharedShape::voxelized_mesh(pv, &indices, voxel_size, fill_mode.into()).into()
         })
     }
 
@@ -1094,8 +1101,9 @@ impl Collider {
         indices: &[[u32; DIM]],
         parameters: &VhacdParameters,
     ) -> Vec<Self> {
+        let pv = vertices;
         SharedShape::voxelized_convex_decomposition_with_params(
-            vertices,
+            pv,
             indices,
             &parameters.clone().into(),
         )
@@ -1241,8 +1249,10 @@ impl Collider {
     /// ```
     #[cfg(feature = "collider-from-mesh")]
     pub fn convex_hull_from_mesh(mesh: &Mesh) -> Option<Self> {
-        extract_mesh_vertices_indices(mesh)
-            .and_then(|(vertices, _)| SharedShape::convex_hull(&vertices).map(|shape| shape.into()))
+        extract_mesh_vertices_indices(mesh).and_then(|(vertices, _)| {
+            let pv = vertices;
+            SharedShape::convex_hull(&pv).map(|shape| shape.into())
+        })
     }
 
     /// Creates a compound shape obtained from the decomposition of a `Mesh`.
@@ -1264,7 +1274,8 @@ impl Collider {
     #[cfg(feature = "collider-from-mesh")]
     pub fn convex_decomposition_from_mesh(mesh: &Mesh) -> Option<Self> {
         extract_mesh_vertices_indices(mesh).map(|(vertices, indices)| {
-            SharedShape::convex_decomposition(&vertices, &indices).into()
+            let pv = vertices;
+            SharedShape::convex_decomposition(&pv, &indices).into()
         })
     }
 
@@ -1295,12 +1306,9 @@ impl Collider {
         parameters: &VhacdParameters,
     ) -> Option<Self> {
         extract_mesh_vertices_indices(mesh).map(|(vertices, indices)| {
-            SharedShape::convex_decomposition_with_params(
-                &vertices,
-                &indices,
-                &parameters.clone().into(),
-            )
-            .into()
+            let pv = vertices;
+            SharedShape::convex_decomposition_with_params(&pv, &indices, &parameters.clone().into())
+                .into()
         })
     }
 
@@ -1690,7 +1698,7 @@ fn scale_shape(
                 ));
                 #[cfg(feature = "3d")]
                 scaled.push((
-                    make_pose(pose.translation * scale, pose.rotation),
+                    make_pose(pose.translation * scale, Rotation(pose.rotation)),
                     scale_shape(shape, scale, num_subdivisions)?,
                 ));
             }
