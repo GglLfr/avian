@@ -13,7 +13,7 @@ use crate::{
 };
 #[cfg(all(feature = "bevy_scene", feature = "default-collider"))]
 use bevy::world_serialization::{
-    WorldAssetRoot, WorldInstance as SceneInstance, WorldInstanceSpawner as SceneSpawner,
+    WorldAssetRoot, WorldInstance as SceneInstance, WorldInstanceSpawner,
 };
 use bevy::{
     ecs::{intern::Interned, schedule::ScheduleLabel},
@@ -328,7 +328,7 @@ fn init_collider_constructor_hierarchies(
     #[cfg(feature = "collider-from-mesh")] meshes: Res<Assets<Mesh>>,
     #[cfg(feature = "collider-from-mesh")] mesh_handles: Query<&Mesh3d>,
     #[cfg(feature = "collider-from-mesh")] mut collider_cache: Option<ResMut<ColliderCache>>,
-    #[cfg(feature = "bevy_scene")] scene_spawner: Res<SceneSpawner>,
+    #[cfg(feature = "bevy_scene")] scene_spawner: If<Res<WorldInstanceSpawner>>,
     #[cfg(feature = "bevy_scene")] scenes: Query<&WorldAssetRoot>,
     #[cfg(feature = "bevy_scene")] scene_instances: Query<&SceneInstance>,
     collider_constructors: Query<(Entity, &ColliderConstructorHierarchy)>,
