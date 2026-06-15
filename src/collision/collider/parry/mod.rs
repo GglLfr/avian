@@ -1692,7 +1692,7 @@ fn scale_shape(
                 ));
                 #[cfg(feature = "3d")]
                 scaled.push((
-                    make_pose(pose.translation * scale, Rotation(pose.rotation)),
+                    make_pose(pose.translation * scale, pose.rotation),
                     scale_shape(shape, scale, num_subdivisions)?,
                 ));
             }
