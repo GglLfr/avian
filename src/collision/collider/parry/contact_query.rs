@@ -199,7 +199,7 @@ pub fn contact_manifolds(
             prediction_distance,
         )
     {
-        let normal: Vector = rotation1 * contact.normal1;
+        let normal = rotation1 * contact.normal1;
 
         // Make sure the normal is valid
         if !normal.is_normalized() {

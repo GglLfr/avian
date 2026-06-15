@@ -1015,8 +1015,6 @@ impl Collider {
             .iter()
             .map(|c| c.as_i64vec3())
             .collect::<Vec<_>>();
-        #[cfg(all(feature = "3d", not(feature = "f64")))]
-        let grid_coordinates = &grid_coordinates;
         let shape = Voxels::new(voxel_size, grid_coordinates);
         SharedShape::new(shape).into()
     }
