@@ -118,10 +118,6 @@ criterion = { version = "0.8", features = ["html_reports"] }
 # bevy_mod_debugdump = { version = "0.15" }
 rand = "0.10"
 
-[patch.crates-io]
-bevy = { git = "https://github.com/bevyengine/bevy.git" }
-bevy_math = { git = "https://github.com/bevyengine/bevy.git" }
-
 [lints]
 workspace = true
 
