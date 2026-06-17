@@ -14,3 +14,4 @@ opt-level = 1 # Use slightly better optimization, so examples work
 [patch.crates-io]
 bevy = { git = "https://github.com/bevyengine/bevy.git" }
 bevy_math = { git = "https://github.com/bevyengine/bevy.git" }
+bevy_reflect = { git = "https://github.com/bevyengine/bevy.git" }
